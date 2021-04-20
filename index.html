@@ -1,0 +1,994 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset = 'utf-8'>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	
+	<script type="text/javascript" src="echart.js"></script>
+	<script src="jquery.min.js"></script>
+	<script src="bootstrap.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" >
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="echart.css">
+	<title>Supporting Features Updating of Apps by Analyzing Similar Products in App Stores</title>
+	<style type="text/css">
+	    .tooltip-inner {
+  width: 200px;
+  max-width: 300px;
+  padding: 3px 8px;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  background-color: #696969;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align:left
+}
+.tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+}
+.tooltip.top .tooltip-arrow {
+  bottom: 0;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px 5px 0;
+  border-top-color: #696969;
+}
+.tooltip.top-left .tooltip-arrow {
+  bottom: 0;
+  left: 5px;
+  border-width: 5px 5px 0;
+  border-top-color: #696969;
+}
+.tooltip.top-right .tooltip-arrow {
+  right: 5px;
+  bottom: 0;
+  border-width: 5px 5px 0;
+  border-top-color: #696969;
+}
+.tooltip.right .tooltip-arrow {
+  top: 50%;
+  left: 0;
+  margin-top: -5px;
+  border-width: 5px 5px 5px 0;
+  border-right-color: #696969;
+}
+.tooltip.left .tooltip-arrow {
+  top: 50%;
+  right: 0;
+  margin-top: -5px;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #696969;
+}
+.tooltip.bottom .tooltip-arrow {
+  top: 0;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 0 5px 5px;
+  border-bottom-color: #696969;
+}
+.tooltip.bottom-left .tooltip-arrow {
+  top: 0;
+  left: 5px;
+  border-width: 0 5px 5px;
+  border-bottom-color: #696969;
+}
+.tooltip.bottom-right .tooltip-arrow {
+  top: 0;
+  right: 5px;
+  border-width: 0 5px 5px;
+  border-bottom-color: #696969;
+}
+
+    </style>
+  </head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Home</a>
+        </div>
+      </div>
+    </nav>
+    <div class="jumbotron pic" background='1.jpg'>
+      <div class="container">
+        <h1 style='color:#000000'><b>Supporting Features Updating of Apps by Analyzing Similar Products in App Stores</b></h1>
+      </div>
+    </div>
+	<div class='container'>
+	  <p>We propose an approach to analyze the data resources (App descriptions, release texts and reviews) in App stores for helping John make feature updating strategy of his product. The main process are as follow: </p>
+	  <br>
+	  <p><b>① Constructing background knowledge</b><br> </p>
+	  <p><b>② Mining Updated information</b><br> </p>
+	  <p><b>③ Updated information analysis</b><br> </p>
+	</div>
+	<div class='container' style='text-align:center; border-bottom: solid; border-color: #696969; padding-bottom:10px;'>
+	  <img style='width:70%' src='overview.png'>
+	  <h3><b>Overview of approach</b></h3>
+	</div>
+
+	<div class='container'>
+      <h2><b>Feature Framework</b></h2>
+	  <p>We analyse the description of similar apps and build feature framework as the background knowledge. <br><br> After analyse the similar apps of Here WeGo, we build the feature framework and part of it is shown as this figure.</p>
+	  <div class= 'container' >
+	    <div class = 'col-md-2'></div>
+	    <div id='container3' class = 'col-md-10' style='height:700px; text-align:center'></div>
+	  </div>
+	  <div class='container' >
+	    <h2><b>Visualization</b></h2>
+		<p>The Feature updating Trend of Similar Apps (FTSA) map uses the updated features in similar products to show the changes trend of concerns of their developers over time.</p>
+                                <p>The User Feedback on the Feature updating Actions (UFFA) map shows user feedback on different updating actions of features. </p>
+		<br>
+		<p>The map is interactive, you can click the point to check user's feedback on the updated action</p>
+		<div style='height:50px'></div>
+		<div class='row-fluid' onmouseover = "pop()" style="height: 400px; border:solid; border-width:0.5px; padding-top:10px">
+		  <div class='col-md-6' id="container" style="height: 400px;" ></div>
+		  <div class='col-md-6' id="container1" style="height: 400px; "></div> 
+	    </div>
+	  </div>
+	  
+      <hr>
+      <footer>
+        <p>© 2019 JLU Software Engineering.</p>
+      </footer>
+    </div>
+	
+    
+</body>
+<script type="text/javascript">
+
+
+$(function () { $("[data-toggle='popover']").popover(); });
+
+
+function create_chart_1(feedback, colors){
+    var dom1 = document.getElementById("container1");
+	var myChart1 = echarts.init(dom1);
+	var app1 = {};
+	var option1 = null;
+	var data = [
+	    // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+        [[28604,770,17096869,'use map','Route Building feauture is awesome'+'<br>'+'Thank you for adding the choice of building route based on subway','Wrong route planning!'+'<br>'+"Some route are a bit stupid, or the road doesn't exist"], 
+		[10000,840,27096869,'download map'],
+		[4400,500,23968973,'mark map']]
+    ];
+	var data = feedback;
+	option1 = {
+        title: {
+            text: 'UFFA map'
+        },
+        legend: {
+            right: 10,
+            data: ['features']
+        },
+        xAxis: {
+            splitLine: {
+                lineStyle: {
+                    type: 'dashed'
+                }
+            }
+        },
+        yAxis: {
+            splitLine: {
+                lineStyle: {
+                    type: 'dashed'
+                }
+            },
+            scale: true
+        },
+		tooltip: {
+		    padding: 10,
+			extraCssText:'width:500px; white-space:pre-wrap',
+            backgroundColor: 'rgba(255,255,255,0.8)',
+			//backgroundColor: 'rgba(144,238,144,1)',
+            borderColor: colors[0],
+			borderWidth: 3,
+			textStyle : {
+                color: '#000000'
+            },          
+			formatter: function (obj) {
+                return '<div style="text-align: center; border-bottom: 1px solid ; font-size: 18px; color:'+colors[0]+'; padding-bottom: 7px;margin-bottom: 7px">'
+                    + '<b>' + obj.data[3] + '</b>'
+                    + '</div>'
+					+ '<div style="text-align: center">'
+                    + "<b> Users' preference: </b> " + obj.data[1] + " <b>Users' attention:</b> " + obj.data[0] + '<br>'
+					+ '</dir>'
+					+ '<div style="text-align: center; font-size: 15px; padding-top: 6px;">'
+					+ '<b>Top positive</b>:'+'<br>'
+					+ '</div>'
+					+ '<div style="text-align: left;">'
+					+ obj.data[4] + '<br>'
+					+ '</div>'
+					+ '<div style="text-align: center; font-size: 15px; padding-top: 6px;">'
+					+ '<b>Top negative</b>:'+'<br>'
+					+ '</div>'
+					+ '<div style="text-align: left;">'
+					+ obj.data[5] + '<br>'
+					+ '</div>';
+
+            }
+        },
+        series: [{
+            data: data[0],
+            type: 'scatter',
+            symbolSize: function (data) {
+                return (Math.log(data[0])+ data[1])*10;
+            },
+            label: {
+			    normal:{
+				    show: true,
+					formatter: function (param) {
+                        return param.data[3];
+                    },
+					position: 'bottom'
+				},
+            },
+            itemStyle: {
+                normal: {
+                    shadowBlur: 10,
+                    shadowColor: ['#C0C0C0'],
+                    shadowOffsetY: 5,
+					color: new echarts.graphic.RadialGradient(0.4, 0.3, 1, [{
+                        offset: 0,
+						color: colors[1]
+                        },{
+                            offset: 0.5,
+                            color: colors[2]
+                        },{
+                            offset: 1,
+                            color: colors[3]
+                    }])
+                }
+            }
+        }]
+    };
+    myChart1.setOption(option1, true);
+}
+
+
+
+//第一个表  ------------------------------------------------------------------------------
+var dom = document.getElementById("container");
+var myChart = echarts.init(dom);
+var app = {};
+var option = null;
+function pop(){
+     console.log('11111');
+	 $("[data-toggle='popover']").popover({container: 'body'});
+	 $("[data-toggle='tooltip']").tooltip();
+	 }
+option = {
+    title: {
+        text: 'FTSA map'
+    },
+    tooltip: {
+        trigger: 'item',
+		padding: 10,
+		extraCssText:'width:200px; white-space:pre-wrap',
+        backgroundColor: 'rgba(255,255,255,0.8)',
+	    //backgroundColor: 'rgba(144,238,144,0.8)',
+	    borderWidth: 1,
+		textStyle : {
+            color: '#000000'
+        },
+		triggerOn:'click',
+		formatter: function (obj) {
+               // return "abc";
+			   $(function () { $("[data-toggle='popover']").popover(); });
+			   var dotHtml = '<span style="display:inline-block;margin-right:5px;margin-bottom:1px;border-radius:5px;width:6px;height:6px;background-color:'+obj.color+
+			   '"></span>'
+			   var button ='<button type="button" onclick ="pop()"  class="btn btn-primary" title="Popover title"  data-container="body" data-toggle="popover" data-placement="right" '+
+			                'data-content="顶部的 Popover 中的一些内容">顶部的 Popover</button>'
+			   //var button = '<button type="button" class="btn" style="width: 20px; height:20px; border-radius:50%">?</button>'
+			   console.log(obj.color);
+			   console.log(obj.data.detail);
+			   detail_len = obj.data.detail.length;
+			   console.log(detail_len);
+			   details = ''
+			   for (i = 0; i < detail_len; i++){
+			       tip = '"Sentence:<br>' + obj.data.detail[i][1] + '"'
+				   tooltip = '<class><a  data-toggle="tooltip" data-html="true" data-placement="right" title='+tip+'>'+obj.data.detail[i][0]+'</a></class>'
+				   popover = '<class  data-toggle="popover" data-placement="right" data-content="'+tip+'" data-container="body">'+ obj.data.detail[i][0]+'</class>'
+			       details = details +dotHtml+tooltip+'<br>';
+			   }
+			   console.log(details);
+			   return '<div style="border-bottom: 0.5px solid ; border-color: '+obj.color+'; font-size: 15px; padding-bottom: 7px;margin-bottom: 7px">'
+				     + obj.marker
+					 
+                     + obj.seriesName + '<br>'
+					 + '</div>'
+					 + '<div>'
+					 + "<b>Similar Apps' concern:</b><br>"
+					 + obj.data.value
+					 + '<br><b>update details: </b><br>'
+					 //+ obj.data.detail
+					 + details
+				     + '</div>';
+            }
+		//formatter: function(params) {
+		   // console.log(params[0].data.value);
+		 //  return "map:" + params[0].data.value + " Updated Detail: "+ params[0].data.prePrice;
+		 //}
+	},
+    legend: {
+        data:['map','route','traffic'],
+    },
+    
+    toolbox: {
+        
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        //data: ['Jan','02.02-02.22','02.23-03.15','03.16-04.06','04.07-04.27','04.28-05.18'],
+		data: ['Jan 01,2019','','','','','Jun 30,2019'],
+		axisLabel:{
+			//interval: 
+		}
+    },
+    yAxis: {
+        type: 'value',
+		min: function(value){
+			return -1;
+		}
+    },
+    series: [
+        {
+            name:'map',
+            type:'line',
+			// 折线颜色
+			itemStyle: {
+               normal: {
+                   color: '#FFA500',
+                   lineStyle: {
+                       color: '#FFA500'
+                   }
+               }
+            },
+		    //smooth:true,
+            data:[
+			    { 
+				    value: 10, //1
+					detail:[
+					  ['with zoom level','Map options improved with zoom level'],
+					  ['with more details','enlage map with more details'],
+					  ['with day/night mode','view map with day/night mode'],
+					],
+			        feedback: [
+	                  // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                      [
+					    [111,0.45,17096869,'download map',
+						  '+ Just come to place, catch the Internet, download the map and go ahead!!<br>+ I strongly recommend downloading maps before hand if there is any chance of losing connectivity.',
+						  '- Kathmandu maps download getting failed all the time.'+'<br>'+"- After doing so, app works reasonably ok but after the next time I am online again, the app again looses the maps (while they stil are installed) & requires AGAIN a cumbersome download of all of them."], 
+		                [80,0.26,27096869,'map',
+					      '+ Also generally (but not always) provides better detail at maximum zoom than downloaded Google maps.<br>+ The offline map was really detailed (it even includes waterholes in Etosha, and accommodation names), and you can do route navigation and searches all offline (rarer than you would think).',
+						  '- When searching for a location and the point is shown on the map and you decide to zoom out/in to have a better view of the area, the point disappears and you have to search again to get back to the location.<br> - Bug report: Sometimes the search window is suddenly opening during map zoom.'],
+                        [254, 0.74, 0, 'update map',
+					      '+ With recent map update India map looks excellent and more than 95% accurate from my Hyderabad experience.<br>+ It is based on OpenStreetMap maps that are a lot more accurate than google maps.',
+						  '- I lost half of my maps UK disappeared why are you doing updates when you are not ready for that???<br>- Stupid updates that wipe all your maps when you are travelling.'],
+					    [24, 0.91, 0, 'view map',
+					      "+ Visible renewed app!, simple view & optimized maps with more info<br>+ It's excellent that the map can show night mode",
+						  "- i cant see to understand how to change the view.i download maps for my area and when i open the app i see a landscape picture of the globe.i cant see or know how to zoom in like on a conventional gps app.uninstalled<br>- However map can't switch to  night mode automatically."],
+					    [10, 0.51, 0, "enlarge map",
+						  "+ Just so easy to view and clear maps great even street walking.<br>+ Map enlarge feature is great, would be better if street name on the maps can also be enlaged when maps are enlarged.",
+						  "- idk what's wrong but now my mini map (if i switch app, the google map automatically turns to mini map right) cannot be enlarged or closed anymore (can be dismissed by dragging down).<br>- the problem is, i like to switch between app with mini map, and switch to enlarge the map if i need to see details."]
+					  ]
+					]
+			     },
+			    { 
+				    value: 8, //2
+					detail: [
+					  ['in the external card', 'Possibility to store maps in the external card'],
+					  ['with marked tourist trails and bikeways','Offline tourist map with marked tourist trails and bikeways.'],
+					  ['offline', 'Offline tourist map with marked tourist trails and bikeways.']
+					],
+			        feedback: [
+	                  // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                      [
+					    [389,0.93,17096869,'store map',
+					      '+ I love the feature that you can save your maps on your SD card.'+'<br>'+'+ I like that I can download just the maps needed and that I can store them on the SD card.',
+						  '- Even though the maps can be stored in external storage, the application takes an incredible amount of internal storage.'+'<br>'+"- However, this does not give you the option to choose whether to save maps data onto the SD card or phone storage, and instead uses the one with the most amount of free space."], 
+		                [34,0.64,27096869,'update map',
+					      '+ Regular map update is nice.<br> + Easy to update and download maps for different areas.',
+					   	  "- Don't know how often are the maps update but London map is like a year old.<br> - App broken after the maps update."],
+				        [57, 0.84, 0, 'use map',
+					      "+ excellent maps, great for offline use.<br>+ offline map app which can be used all over the world accurately.",
+						  "- The updated map does not have a continuous compass on screen, and this has caused me many problems.<br>- after update it got difficult to get navigation, if u see the map it won't move in the direction u r moving, which makes difficult to check the routes."],
+					    [165, 0.24, 0, 'map',
+					      "+ This map app really saved oir bacon in Havana where Internet is notoriously scarce.<br>+ An important part of the screen has the ad and it is difficult to select a map function without hitting the ad",
+						  "- Apart from this, its map updates do not catch up to the real road changes - sometimes I've had to wait for 2 years for a new highway partition to show on their maps.<br>- I cannot use the app since it forces me to download ondonesia map update which can never be downloaded completely."]
+					  ]
+					]
+		    	},
+			    {
+				    value: 9,//3 
+					detail: [
+					  ['in 3D mode','View map in 3D mode'],
+					  ['offline', 'add: option to backup offline maps to third party cloud storage.'],
+					  ['to third part cloud storage', 'add: option to backup offline maps to third party cloud storage.'],
+					  ['Intelligent', '- Intelligent map mode during navigation.'],
+					  ['during navigation', '- Intelligent map mode during navigation.'],
+					  ['light', 'We have added light maps'],
+					  ['different', '- you can choose different maps style which you like in app settings']
+					],
+		    	    feedback: [
+	                  // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                      [
+					    [61,0.57,17096869,'map',
+					    '+ Good, detailed maps, fast screen updating, it was also my po prefered app on iOS, I paid for this app.'+'<br>'+'+ Such a useful offline map, showing walking paths as well as roads.',
+					    '- This map violates the territorial integrity of Azerbaijan!'+'<br>'+"- City maps consume lots of space."],
+					    [133, 0.24, 0, 'view map',
+					      "+ Extremely reliable, easy to use and provides access to the excellent open maps.<br>+ Very user friendly and love the 3D buildings in the map.",
+						  "- When navigating in 3d view, i cant manipulate the map without switching to 2d mode - I think dragging should be supported to have a look at the next turn while standing at the red light.<br>- Can u make it possible to scroll 3d maps too?"],
+					    [165, 0.61, 0, 'backup map',
+					      "+ Now I can save maps to add card and the free WiFi map is soon to be fully developed I have to give this 5.<br>+ Saves a lot of time instead of looking for maps around the city.",
+						  "- Saved maps didn t show in the apps after updates... pls fix it<br>- I saved an offline map but when i wanted to use it, it didn t work everything is grey as if there was no map saved so discontinueing neta tester and bad app"],
+					    [16, 0.57, 0, 'choose map',
+					      "+ There is a map type and map detail button in the screen now taking up space even when in full screen map mode.<br>+ The ability to download maps of many different types for offline use is wonderful.",
+						  "- tile load better than it used to be, panning around is less painful, switching map types involves too many clicks and bought lomaps dont scale fonts well. but, it still feels best of breed. i complain, but seriously i use this all the time! oddly the sea navigation maps (in german?) is one of the better cleaner choices for some international destinations. if i select korean lomap i dont want to read korean street names!<br>- The format before the update was much better with the upcoming instruction being across the top of the map and not restricting the map in anyway."]
+					  ]
+                    ]
+
+			    },
+			    { 
+				    value: 12, //4
+					detail:[
+					  ['HD','HD 3D map, Offline winter map with cross-country skiing tracks and ski resorts.'],
+					  ['3D','HD 3D map, Offline winter map with cross-country skiing tracks and ski resorts.'],
+					  ['external','support external map in RMA formats'],
+					  ['in RMA formats','support external map in RMA formats'],
+					  ['with cross-country skiing tracks and ski resorts','Offline winter map with cross-country skiing tracks and ski resorts.'],
+					  ['downloaded or downloading', 'Optimised design of \'Download maps\' section: swipe to check your downloaded or downloading maps.']
+					],
+				    feedback: [
+	                  // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                      [
+					    [28,0.78,17096869,'tag map',
+					      '+ We managed to find a few hidden gems just by scrolling through the map and tapping on them.'+'<br>'+"+ I'd love a toggle to get the compass back in driving mode so I can zoom out, tap the compass to point north while viewing the whole map, then tap it again to change the view back.",
+						  '- Then loads the AA screen, but if I tap on the map or anything it crashes.!'+'<br>'+"You have to tap the screen to get the map back up to use it.. very dangerous in high trafic conditions."], 
+		                [297,0.84,111,'map',
+					      '+ A o A i m using google maps its good and one thing plz do more 3d and hd view thanks<br>+ show pictures of this map 3d ok Thanks',
+						  '- 3d map view not working on my device.<br>- Also map scaling (in 3d mode) needs to be more real , like in old tomtom.'],
+		                [84,0.65,23968973,'mark map',
+					      '+ Love how even little cafes and stores are marked on the map.<br>+ It exceeded my expectations, I thought I will add my hotel bookings and use it only for these purposes, it ended up that i was using it as navigation in archeological site where only paths not even ways or streets, and it was all marked on maps.me and saved me lot of time!',
+						  '- But maps never allow I mark as it end.<br>- Personal marks disapear from the map during rescale.'],
+						[15,0.84,0,'support map',
+						  "+ Without data overseas or in remote areas an accurate map with the smallest walking trails.<br>+ great app, very detailed off line maps.",
+						  "- maps are somewhat crude and not refined in details.<br>- navigation seems to work well so far; good maps installed on my phone (does not use much data)."],
+						[17, 0.13, 0, 'check map',
+						  "+ reliable functions, sustainable support and development, very good overall...yes this is..But:please check alpinequest maps, especially openstreet maps group..keep going guys.<br>+ Used in Germany with downloaded maps to avoid data charges. Worked flawlessly.",
+						  "- Couldn't use offline maps that were downloaded. Worthless.<br>- What is the point of offline map application to require online license check every time it starts?"]
+					  ]
+                     ]
+				},
+			    { value: 7, //5
+				  detail:[
+				    ["more offline",'Add more offline maps'],
+					['hiking or cycling', 'show hiking or cycling map']
+				  ],
+				  feedback: [
+	                  // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                      [[241,-0.16,17096869,'map',
+					    '+ Offline maps is easier because you dont have to select the size manually.'+'<br>'+"+ Really great since it doesn't need an internet connection after you downloaded the map(s).",
+						'- Does not work offline with nexus 6 android 7.1.1 downloads offline map, opens, allows location input, navigates, then stops, goes to welcome screen.'+'<br>'+"- Bad expensive memory and internet greedy beaten by google maps and/or waze in every aspect..."], 
+		              [61,0.54,27096869,'update map',
+					    '+ At regular intervals it updates maps.<br>+ Can update and require maps to be downloaded again at an inconvenient time.',
+						'- "We update the maps multiple times per year for free, so that you can always rely on Sygic GPS Navigation." – Shame for the author of this sentence.<br>- Watch out, Sygic updates and you can download again your maps, checked them last Monday before going to Spain and guess what, sit at the airport, starting Sygoc.'],
+		              [54,0.48,23968973,'show map',
+					    '+ The map shows the altitude graph, perfect for foot and off road cycling.<br>+ Great for cycling and better than Google Maps for off-line use.',
+						'- Kathmandu maps download getting failed all the time.<br>- I would recommend you to stop playing politics and focus on the maps themselves and interface.'],
+				
+					   ]
+                     ]
+				},
+			    { value: 9, //6
+				  detail:[
+				    ["on SD card",'Downloaded maps on SD card']
+				  ],
+				  feedback: [
+	                  // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                      [
+					    [124,0.5,17096869,'update map',
+					      '+ maps for BG are updated and with details , soo 5* , cheers'+'<br>'+"+ Excellent maps (thanks OpenStreetMap), crappy SatNav.",
+						  "- Inaccurate and incomplete map of Australia, even for for a simple address located on a main rd it's sometimes wrong or unable to locate."+'<br>'+"Bad expensive memory and internet greedy beaten by google maps and/or waze in every aspect..."], 
+		                [31,0.21,27096869,'zoom map',
+					      '+ Would give it 5 stars if it supported zooming on the map using the scroll wheel on the mouse.<br>Amazing maps is suppose to let the user zoom out till the earth is round!',
+						  "- Can't pinch zoom map like any other navigation app!<br>– However, slow to browse and pan/zoom map."],
+                        [36,0.46,0,'download map',
+						  "+ I like that I can download just the maps needed and that I can store them on the SD card.<br>+ Maps.Me let me easily download all of Italy (or other countries) and create lists of waypoints/bookmarks for each city we plan to visit.",
+						  "- Unfortunatly it does not allow me to save the maps to the SD card on my Chuwi HI 10 Pro dual boot ta blet.<br>- unfortunately recently the application crashes every other week and claims that there is no map available and asks me to redownload the maps."]
+					    ]
+					 ]
+				}
+		    	]
+                },
+        {
+            name:'route',
+            type:'line',
+			markPoint:{
+				large: true,
+				itemStyle: {
+                    normal: {  }
+                },
+				effect:{
+					show: true
+				},
+				itemStyle:{
+                    normal:{
+					    color: '#FF0000',
+					    label:{
+					        show: true,
+					        position: 'top',
+						    formatter: function (param) {
+							    return 'new feature';
+                            }  
+						}
+					}
+				},
+				tooltip:{
+					show: true,
+					triggerOn: 'click',
+					formatter: function(e) {
+    },
+				},
+				data:[
+					{ name: 'new feature', xAxis: 3, yAxis: 3 }
+				]
+			},
+			itemStyle: {
+               normal: {
+                   color: '#3CB371',
+                   lineStyle: {
+                       color: '#3CB371'
+                   }
+               }
+            },
+			//smooth:true,
+			data:[
+			    { 
+			        value: 4,//1
+					detail:[
+					  ['by voice speech', 'We also added our most requested feature: search route by voice speech'],
+					  ['alternative',' NEW: Choose alternative routes with one touch.'],
+					  ['using subways in 74 cities', '- Build your routes using subways in 74 cities!'],
+					  ['with one touch',' NEW: Choose alternative routes with one touch.']
+					],
+			        feedback: [
+	                    // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                        [[133,0.8,17096869,'build route', 
+						  '+ Route Building feauture is awesome<br>+ Thank you for adding the choice of building route based on subway',
+						  "- Wrong route planning!<br>- Some route are a bit stupid, or the road doesn't exist"], 
+		                [13,0.6,27096869,'search route', 
+						  '+ The best map GPS with real time traffic and the best route searching !!!<br>+ Searching by voice is convinient, It helps when driving.', 
+						  "- Often it spends a long time searching for alternate routes but only show me the original.<br>- When I search a route using your app, it's always the wrong estimated arrival time."],
+		                [56,-0.15,23968973,'choose route',
+						  "+ It helps moving in cities and between them with different routes you can choose between based on traffic/time and tolls.<br>+ It'll always pick the fastest route which is great for most people.",
+						  "- Alternate routes can't be easily chosen and are not offered as in google maps. <br>- Very confuzing, and bad route giving."]]
+                        ]
+			    },
+			    { 
+			         value: 5, //2
+					 detail:[
+					   ['where you have gone', 'record route where you have gone'],
+					   ['for navigation', 'You can disable toll roads, highways or ferries for navigation.'],
+					   ['best','Find vehicles near you, compare car2go in the route result with all your other options and choose the best route for your way'],
+					   ['fastest','The fast and convenience route guidance which reflected a real-time traffic situation.'],
+					   ['convenience','The fast and convenience route guidance which reflected a real-time traffic situation.']
+					 ],
+				     feedback: [
+	                     // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                         [[84,0.75,17096869,'choose route',
+						   "+ It also suggests the best alternative route.<br>+ Most improvment would be to offer alternate routes when cycling citys.",
+						   "- It tends to choose the longer route than other GPS apps and the only way to chose an alternative route is to manually add stops.<br> - The alternative routes are way out of the way."], 
+		                 [12,0.53,17096869,'record route',
+						   "+ it's easy and records my path automatically<br> + Route recording function is helpful.",
+						   "- After last update, my recorded routes are missing, please fix it.<br>- 4 stars only because the dashcam can't record the coordinations, speed etc."], 
+		                 [19, -0.21, 0, 'disable route',
+						   "+ If this app update Toll charges of toll road then its will be more useful to select correct route.<br> + google map should add the option and show routes without toll , service road must be highlighted",
+						   '- Can\'t set for fastest route, shortest route, etc, can only choose avoid ..... hiways tolls or ferries. <br> - Maps are not up-to-date and, at every opportunity, will take you through toll roads, even if you\'ve used the "avoid tolls" option. ']
+						 ],
+                         ]
+			    },
+		   	    {
+			         value: 1, //3
+					 detail: [
+					   ['on highways and turnpikes', 'Route info on Highways and Turnpikes with TOLL prices'],
+					   ['with TOLL prices', 'Route info on Highways and Turnpikes with TOLL prices'],
+					 ],
+				     feedback: [
+	                    // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                        [[133,0.8,17096869,'route',
+						  '+ It is wonderful for walking and cycling, and very good for driving where there are no tolls to be paid.<br>+ Thank-you for adding the choice of avoiding toll roads and bridges.',
+						  "- Difficult to understand, too complex, can't route to an exact address, unable to avoid toll roads<br>- I chose a route to avoid tolls, and the route given was 2-1/2 hours longer than with tolls."], 
+		               
+						]
+                     ]
+			    },
+			    { 
+				    value: 7, //4
+					detail:[ 
+					  ['based on means of transportation', 'Choose your route based on means of transportation'],
+					  ['on a desktop', 'Plan your route on a desktop and send it to your mobile'],
+					  ['including journeys by bike, car or walking.', 'Route results including journeys by bike, car or walking.'],
+					  ['fastest', 'plan fastest route']
+					],
+			        feedback: [
+	                    // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                        [[161,0.75,17096869,'choose route', 
+					       "+ It's very useful if you not have knowledge of public transport medium and there routes .<br>+ It gives you the best route to take and other info about it.",
+						   "- Stop showing me car routes on the public transport option or at least put them at the bottom.<br>- Does not advance to the next step in the itinerary and suggests routes that involve dangerous crossings of 4 lane highways."], 
+		                [44,0.52,27096869,'share route', 
+						    '+ The good thing I see for every day is the share route option.<br>+ Route sharing is useful when I travel with my friends.', 
+					        '- Somemore after i set the routes and share it, the short url not appearing if my have more than 4 stops.<br>-  WHY IS "SHARED ROUTE" NOT USABLE/MISSING "START" BUTTON? '],
+		                [219,-0.27,23968973,'show route',
+						    '+ Incredible detail and routes, love it!<br>+ Thank you for showing detailed information about driving route.',
+						    "- Showing wrong routes and location made my life tonight in finding a hotel. <br>- Fastest route not shown at all for my usual destination."],
+					    [53,-0.74,27096869,'plan route',
+						  '+ helpful for planned routes and scheduling. <br>+ Very effective, quick to react when changing the planned route etc.',
+						  '- Bad: route planning is hard to use, unintuitive and unreliable'+'<br>'+'- The route planning can be very flakey, sometimes taking me down extremely small roads in stead of larger, faster roads as it thinks this is the "fastest" route!'],
+		                [10,1.0,23968973,'search route',
+						  '+ it better searches the walking and the bicycle route than the google map.<br>'+'+ Thank your for adding choice of bycycle route search<br>',
+						  '- Half the stores it lists don\'t exist, the roads it suggests aren\'t there, and offering suggestions for Walmarts in different states when searching local is prime stupid.<br>- The app always used to drop a pin when searching for a destination and would also show roads in satellite view but now neither of these things happen!']
+						]
+                    ]
+				},
+			    { 
+				    value: 9, //5
+					detail:[ 
+					  ['fastest', 'build fastest route'],
+					  ['detailed', 'detailed route info'],
+					  ['with turn-by-turn voice guidance','tracking route with turn by turn voice guidance'],
+		              ['tracked', 'Tracked route can be share now']
+					],
+				    feedback: [
+	                    // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                        [[28,0.52,17096869,'build route', 
+						  '+ It would be very good to add another option to route planning to prefer main/national roads in detriment of secondary roads (similar sense to the avoid ferries or unpaved roads).<br>+ It is better for the next upgrade to include that we can manually make our own routes.',
+						  '-  it takes very long to create a route, 30 seconds and more for a straightforward route is normal'+'<br>'+"- Changing or redoing a route is cumbersome and slow."], 
+		                [54,0.73,27096869,'route', 
+						  '+ Happy to see more details for optional route ahead like distance to arrive.<br>+ Route info is really detailed, awesome!', 
+						  '- The UI is not very intuitive and trying to select a route between 2 bookmarked locations.<br> - But to the developers please put an option for the tollway routes "on/off"..thanks.'],
+		                [85,-0.4,23968973,'track route',
+						  '+ App is good ,espicially showing the tracks to follow on roads are amazing, but need to update more route (alternate routes choosing ) options also.<br> + Picks better routes than my old Garmin and has better traffic avoidance, but the voice is still too mechanical.',
+						  '- The last annoying thing is the constant voice telling you "slight left" or "slight right" for every bend in the road. <br>' + "- When navigation voice comes on, my in-car music drops completely to silent (doesn't just lower music volume), then comes back on after voice navigation finishes."],
+						[3, 0.19, 0, 'share route',
+						  '+ Informs about the traffic as well as the shortest and fastest route possible.',
+						  '-The app said they shared the route, now I\'m in the opposite side of the f city<br>its tells about shortest route but does share the road conditions.']  
+					]
+                    ]
+				},
+			    { 
+				    value: 8, //6
+					detail: [
+					  ['based on vehicle','calculate alternaitve real-time route, in an offline mode'],
+					  ['alternative', 'calculate alternaitve real-time route, in an offline mode'],
+					  ['real-time','calculate alternaitve real-time route, in an offline mode'],
+					  ['with live traffic status','plan route based on vehicle, with live traffic status'],
+					  ['in an offline mode','calculate alternaitve real-time route, in an offline mode']
+					],
+			        feedback: [
+	                  // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                      [[39,0.43,17096869,'calculate route', 
+					    '+ It also suggests the best alternative route.'+'<br>'+'+ Set up good real time truck routes.',
+					    '- Shown Only one navigation route, though many alternate available.'+'<br>'+"- Routing is good but the UI is totally unintuitive."], 
+		              [76,0.82,27096869,'plan route', 
+					    '+ Love the alternative route suggestions when traffic is heavy. <br>+ Gives you a great route and traffic info is very accurate.', 
+						'- But my only concern is that it does not have a route option for motorcycles. <br>- Shame no motorcycle route setting though.']
+		              ]
+                    ]
+				}
+		    
+		     ]
+             },
+        {
+            name:'traffic',
+            type:'line',
+			itemStyle: {
+               normal: {
+                   color: '#4169E1',
+                   lineStyle: {
+                       color: '#4169E1'
+                   }
+               }
+            },
+			//smooth:true,
+			data:[
+			    { 
+				    value: 4,//1
+					detail: [
+					  ["HD",'- HD traffic'],
+					  ['for The Netherlands and Luxembourg','Added traffic information for The Netherlands and Luxembourg'],
+					  ['on your route', 'Alert traffic condition on your route.']
+					],
+				    feedback: [
+	                // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                      [
+					    [181,0.35,17096869,'update traffic', //1
+					      "+ The price of lifetime maps update and traffic was enough to purchase.'<br>'+ The new updates adding speed limit, speed traps, and accidents are great, but what would be awesome (take note, Google) is if you could know what lane an accident is in when you're 2 miles back in traffic so you could get over in a decent amount of time.",
+					      "- I changed my rate for This application , because it doesn't support traffic and map update in Iran'<br>- Shows traffic updates very late and sticky, location sharing becomes worst."],
+					    [133,0.78,17096869,'traffic', //2
+					      '+ great features including avoiding traffic jams, warnings of speed traps and finding grocery stores and other places'+'<br>'+'+ The traffic sidebar does a good job of letting you know how far away the jam is, and how much time each jam is going to cost you.',
+					      '- traffic not showing properly iam using this application in delhi but this is not working like google map'+'<br>'+"- hello why unavailable traffic data in my country (iran)"], 
+		                [44,0.64,27096869,'warn traffic',//1
+					      '+ Very helpful even without internet although you are not warned in road construction and traffic but finding street is very helpful thanks to the developer...<br> + Really appreciate the warnings for traffic police broke down vehicles and construction, great stuff.',
+						  "- The traffic warning isn't much good either; many a time I'm stuck in stationery traffic with no warning or alternate route.<br>- Don't always agree with routing and overall worth having especially the traffic warning"]
+					  ]
+                    ]
+			    },
+			    { 
+				    value: 0,//2 
+					detail: [],
+					feedback:[]
+				},
+				{ 
+				    value: 3, //3
+					detail:[ 
+					  ["real-time",'Real-time traffic condition'],
+					  ['in 36 Countries', 'Traffic Data in 36 Countries.']
+					],
+				    feedback: [
+	                // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                      [
+					    [173,0.94,17096869,'avoid traffic', 
+					      '+ It also tends to avoid nasty traffic polluting roads and sends you on the more pleasant routes.'+'<br>'+'+ Also i use to check live traffic to avoid delay to reach destination.',
+					      "- It would have got 5 from me, but for a few faults, including speed limits on many roads which were changed years ago, but haven't been updated, and the hit and miss rerouting to avoid traffic, with some alternative routes being absolutely stupid. <br> - However Sygic provides a very poor traffic info."], 
+		                [36,0.93,27096869,'traffic',
+					      '+ Real-time traffic is really helpful.<br> + Real Time is awesome and the traffic is getting better.',
+						  "- traffic info sometimes doesn't work after last update.<br>- Shows wrong traffic data."]
+					  ]
+                    ]
+			    },
+				{ 
+				    value: 3, //4
+					detail: [
+					  ['Actively','Actively track traffic conditions on your route.'],
+					  ['on your route','Actively track traffic conditions on your route.']
+					], 
+				    feedback: [
+	                // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                      [
+					    [34, -0.47, 0, 'track traffic',
+						  '+ With this I can save my places, check the best routes and even design mines, and the traffic as well.<br>- It s shows the perfect time and traffic in the area  which helps me to take another route and save my time.',
+						  '- Colors contrast in night with traffic are confusing and messed up making it difficult to differentiate between road I am on, service road and adjacent opposite roads.<br>- Traffic very difficult to determine unless you zoom in very close, also this app runs very slow on Samsung s5 phones.'],
+		                [146,0.73,27096869,'traffic',
+					      '+ Traffic alerts with diverting and camera alerts brilliant.<br> + It is a solid little app with good clear directions and excellent traffic updates.',
+						  "- Well sometime the live traffic isn't so good.<br>- Traffic conditions do not update in real time so surprise road closures and construction can add significant drive time that you hadn't planned for… because Google Maps didn't alert you to them."],
+						[18, 0.97, 0, 'estimate traffic',
+						  '+ But I love the new traffic etimate feature! <br> + It has been excellent - providing clear road instructions and good traffic estimates.',
+						  '- Bad pre-traffic jam time estimates (ignorant of local events).<br>- Very worst real time traffic updates, showing miserable roads, the permanently closed roads more than  a year also showing .']
+					  ]
+                    ]
+			    },
+			    { value: 5, //5
+				  detail: [
+					['to a CSV file','New option to save traffic data to a CSV file'],
+					['real-time', 'Added real-time traffic camera & many more'],
+					['historic','Show historic traffic information']
+				  ],
+				  feedback: [
+	                // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                      [
+					    [26,0.67,17096869,'show traffic', 
+					      '+ Waze does a better job of showing traffic and finding the fastest route.'+'<br>'+'+ Also shows real time traffic and estimated time to reach a place.',
+					      "- After the latest update its not showing the speed cameras and traffic signal lights ahead. <br> - It's a pity that routes doesn't show real traffic in my country area."], 
+					    [276,0.86,17096869,'avoid traffic', 
+					      '+ used more than my satnav when I was doing delivery driving as would update routes depending on traffic and alerts were 99% accurate'+'<br>'+'+ Helped a lot with finding acomodation, places to eat, cheapest petrol, avoiding traffic jams and accidents.',
+					      "- However, the real-time traffic info is not for the drivers in Jakarta. <br> - I find e traffic info abit too brief for me to really avoid a potential jam."], 
+		                [344,0.41,27096869,'traffic',
+					      "+ Tomtom are the finest satnav maker's in the world, and this app doesn't disappoint with 50 free miles of navigation included, easy to follow instructions and traffic information as well.<br> + making our travels easier with the correct route and avoiding heavy traffic.",
+						  "- But the routing based on traffic doesn't work well.<br>- The routing is actually ok, although the estimated timings don't take traffic conditions into account."],
+						[38, 0.71, 0, 'warn traffic',
+						  '+ Historically this App has been quite good; the accident or traffic alerts and automatic route changing function, warnings about speed cameras were all useful. <br> + I also love the reporting feature that warns, and allows you to warn, drivers of speed traps and traffic slow downs.',
+						  '- As noted in other reviews, the app looks pretty, but does a poor job of estimating times of arrival, speed limits shown are incorrect, and the app does not provide alternate routes in the event of poor road conditions or traffic accidents.<br> - Hi, the live traffic is not as good as the default Google map.']
+					  ]
+                    ]
+				},
+			    { value: 1, //
+				  detail:[
+				    ['Live', 'Live Traffic Enabled']
+				  ],
+				  feedback: [
+	                // 评论数[0]， 情感[1]， 半径[2]， feature[3]，positive-review[4], negative-reviews[5]
+                      [
+					    [28,0.91, 0, 'traffic', 
+						'+ Very helpful with live traffic update<br>+ Live traffic details have developed quite better over the time.',
+						'- Use it everyday i ride my bike, searching some place i want to visit is more easy,  but sometimes got wrong with live Traffic<br>- After recent updates two way live traffic on some roads not showing.']
+					  ]
+                    ]
+				}
+			]
+        }
+    ]
+};
+
+function select_colors(color)
+{
+	if (color == '#3CB371'){
+		return ['#3CB371','#90EE90','#228B22','#006400'];
+	}
+	if (color == '#FFA500'){
+		return ['#FFA500','#FFE4B5','#FFA500','#D2691E'];
+	}
+	if (color == '#FF69B4'){ 
+		return ['#FF69B4','#FFC0CB','#FF69B4','#FF1493'];
+	}
+	if (color == '#4169E1'){
+		return ['#4169E1','#B0C4DE','#6495ED','#4169E1' ];
+	}
+}
+ 
+if (option && typeof option === "object") {
+    myChart.setOption(option, true);
+	myChart.on('click', function(params){
+		colors = select_colors(params.color);
+		create_chart_1(params.data.feedback, colors);
+	});
+
+}
+
+//feature framework  ------------------------------------------------------------------------------
+var dom3 = document.getElementById("container3");
+var myChart3 = echarts.init(dom3);
+var app3 = {};
+var option3 = null;
+var data1 = {
+    "name": "root",
+    "children": [
+        {
+            "name": "place",
+            "children": [
+                { "name": "find"},
+				{ "name": "visit"},
+				{ "name": "save"},
+				{ "name": "add"},
+				{ "name": "explore"},
+				{ "name": "search"},
+              
+            ]
+        },
+		{
+            "name": "location",
+            "children": [
+                { "name": "share"},
+				{ "name": "show"},
+				{ "name": "view"},
+				{ "name": "find"},
+				{ "name": "understand"}
+              
+            ]
+        },{
+            "name": "route",
+            "children": [
+                { "name": "plan"},
+				{ "name": "show"},
+				{ "name": "save"},
+				{ "name": "share"},
+				{ "name": "calculate"},
+				{ "name": "choose"},
+				{ "name": "track"},
+				{ "name": "draw"},
+				{ "name": "find"}
+              
+            ]
+        },{
+            "name": "map",
+            "children": [
+                { "name": "zoom"},
+				{ "name": "download"},
+				{ "name": "import"},
+				{ "name": "update"},
+            ]
+        },{
+            "name": "traffic",
+            "children": [
+                { "name": "avoid"},
+				{ "name": "provide"},
+				{ "name": "see"},
+				{ "name": "check"},
+				{ "name": "show"},
+				{ "name": "search"},
+				{ "name": "reroute"}
+              
+            ]
+        },{
+            "name": "speed",
+            "children": [
+                { "name": "alert"},
+				{ "name": "monitor"},
+				{ "name": "get"},
+				{ "name": "set"},
+				{ "name": "check"},
+				{ "name": "calculate"}
+              
+            ]
+        }
+    ]
+};
+
+myChart3.hideLoading();
+myChart3.setOption(option = {
+    tooltip: {
+        trigger: 'item',
+        triggerOn: 'mousemove'
+    },
+	itemStyle: {
+	    fontSize: 15,
+	    normal: {
+            label: {
+            //show: true,
+            position: 'right',
+            formatter: "{b}"
+            },
+            color: '#fa6900',
+			fontSize: 12,
+            borderWidth: 2,
+            borderColor: '#cc66ff'
+        },
+        emphasis: {
+            borderWidth: 0,
+			fontSize:20
+        }
+    },
+    legend: {
+        top: '2%',
+        left: '3%',
+        orient: 'vertical',
+        borderColor: '#c23531'
+    },
+    series:[
+        {
+            type: 'tree',
+
+            name: 'tree1',
+
+            data: [data1],
+
+            top: '5%',
+            left: '7%',
+            bottom: '2%',
+            right: '60%',
+
+            symbolSize: 7,
+
+            label: {
+                normal: {
+                    position: 'left',
+                    verticalAlign: 'middle',
+                    align: 'right'
+                }
+            },
+
+            leaves: {
+                label: {
+                    normal: {
+                        position: 'right',
+                        verticalAlign: 'middle',
+                        align: 'left'
+                    }
+                }
+            },
+
+            expandAndCollapse: true,
+
+            animationDuration: 550,
+            animationDurationUpdate: 750
+
+        }
+        
+    ]
+});
+
+
+
+       </script>

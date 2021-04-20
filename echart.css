@@ -1,0 +1,159 @@
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+.pic{
+  background-image:url('background.jpg');
+  background-repeat:no-repeat;
+  background-size: 100%
+}
+p{
+	font-size: 19px;
+	font-family: Avenir; 
+}
+.table{
+	margin-bottom: -1px;
+}
+.extraCssText{
+  width:100px; white-space:pre-wrap;
+  }
+
+h2{
+    margin-top: 55px;
+    margin-bottom: 20px;
+	font-family: Avenir;
+    font-size: 35px;
+    line-height: 1.2;
+    font-weight: 500;
+    clear: both;
+}
+
+.dialog-box {
+            width: 200px;
+            height: 100px;
+            border: 1px solid #ccc;
+            position: relative;
+            margin-top: 30px;
+            background-color: #fff;
+        }
+.dialog-box-1 .triangle {
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid #ccc;
+            border-left: 10px solid transparent;
+            position: absolute;
+            top: -20px;
+            left: 10px;
+}
+.dialog-box-2 .triangle {
+            width: 0;
+            height: 0;
+            border-top: 10px solid red;
+            border-right: 10px solid red;
+            border-bottom: 10px solid transparent;
+            border-left: 10px solid transparent;
+            position: absolute;
+            top: -1px;
+            right: -1px;
+}
+.dialog-box-3 .triangle {
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid #ccc;
+            border-left: 10px solid transparent;
+            position: absolute;
+            top: -20px;
+            left: 10px;
+}
+.dialog-box-3 .triangle:after {
+            content: "";
+            border-top: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid #fff;
+            border-left: 8px solid transparent;
+            position: absolute;
+            top: -6px;
+            left: -8px;
+}
+
+.popover{
+	z-index : 1150;
+}
+
+
+.tooltip-inner {
+  width: 200px;
+  max-width: 300px;
+  padding: 3px 8px;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  background-color: #696969;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align:left
+}
+.tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+}
+.tooltip.top .tooltip-arrow {
+  bottom: 0;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px 5px 0;
+  border-top-color: #696969;
+}
+.tooltip.top-left .tooltip-arrow {
+  bottom: 0;
+  left: 5px;
+  border-width: 5px 5px 0;
+  border-top-color: #696969;
+}
+.tooltip.top-right .tooltip-arrow {
+  right: 5px;
+  bottom: 0;
+  border-width: 5px 5px 0;
+  border-top-color: #696969;
+}
+.tooltip.right .tooltip-arrow {
+  top: 50%;
+  left: 0;
+  margin-top: -5px;
+  border-width: 5px 5px 5px 0;
+  border-right-color: #696969;
+}
+.tooltip.left .tooltip-arrow {
+  top: 50%;
+  right: 0;
+  margin-top: -5px;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #696969;
+}
+.tooltip.bottom .tooltip-arrow {
+  top: 0;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 0 5px 5px;
+  border-bottom-color: #696969;
+}
+.tooltip.bottom-left .tooltip-arrow {
+  top: 0;
+  left: 5px;
+  border-width: 0 5px 5px;
+  border-bottom-color: #696969;
+}
+.tooltip.bottom-right .tooltip-arrow {
+  top: 0;
+  right: 5px;
+  border-width: 0 5px 5px;
+  border-bottom-color: #696969;
+}
